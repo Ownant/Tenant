@@ -1,0 +1,40 @@
+services:
+  tenant-service-database:
+    container_name: tenant-service-database
+    image: bitnami/mongodb:latest
+    restart: always
+    ports:
+      - 27022:27017
+    networks:
+      - tenant-service-network
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=tenant-service-database
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=root
+      - MONGODB_DATABASE=tenant-service-database
+      - MONGODB_ROOT_USERNAME=root
+      - MONGODB_ROOT_PASSWORD=root
+
+  tenant-service:
+    build: .
+    container_name: tenant-service
+    restart: always
+    networks:
+      - tenant-service-network
+    ports:
+      - 8084:8084
+    environment:
+      - MONGO_DB_HOST=tenant-service-database
+      - MONGO_DB_URI=mongodb://root:root@tenant-service-database/tenant-service-database?retryWrites=true&w=majority
+      - MONGODB_DATABASE=tenant-service-database
+      - MONGODB_ROOT_USERNAME=root
+      - MONGODB_ROOT_PASSWORD=root
+      - MONGODB_PORT=27017
+      - AUTHENTICATION_ENDPOINT=http://user-service:8081/ownant/user/authenticate
+    depends_on:
+      - tenant-service-database
+
+networks:
+  tenant-service-network:
+    external:
+      name: ownant-network
