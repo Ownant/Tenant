@@ -14,6 +14,7 @@ public class EnrollToApartmentResponse {
     String tenantActivationCode;
     String ownerId;
     String tenantId;
+    Integer rentAmount;
     Address address;
     ErrorDetails error;
 }
